@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env*.local
+.DS_Store
+.expo/
+dist/
+web-build/
+
+# local database: your personal finance data, never commit it
+backend/data/
+*.db
+*.db-*
+
+# local Claude settings
+.claude/
