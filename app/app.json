@@ -31,6 +31,12 @@
       "expo-build-properties",
       "expo-font",
       "expo-notifications"
-    ]
+    ],
+    "owner": "umarijaz01",
+    "extra": {
+      "eas": {
+        "projectId": "643ba458-e2e7-4cbb-9d03-57ebef85332a"
+      }
+    }
   }
 }
