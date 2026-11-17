@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Hisaab Kitaab",
+    "name": "Ledgero",
     "slug": "hisaab-kitaab",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -34,7 +34,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#010C2E"
+          "backgroundColor": "#FFFFFF"
         }
       ]
     ],
