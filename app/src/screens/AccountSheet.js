@@ -1,7 +1,9 @@
-import React from 'react';
-import { Modal, View, Text, ScrollView, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { Modal, View, Text, ScrollView, TextInput, Pressable, Alert } from 'react-native';
 import { C, T } from '../theme';
 import { useAuth } from '../lib/auth';
+import Popup from '../components/Popup';
+import UpgradeSheet from './UpgradeSheet';
 import { Hero, TopBar, GlassBtn, Sheet, InfoRow, Cta } from '../components/ui';
 
 export default function AccountSheet({ visible, onClose }) {
@@ -9,14 +11,19 @@ export default function AccountSheet({ visible, onClose }) {
   const u = auth.user;
   if (!u) return null;
 
-  const confirmLogout = () => {
-    const warn = u.guest
-      ? 'You are using a guest account. Logging out removes access to its data for good, because a guest has no email or password to log back in with.'
-      : 'You can log back in any time with your email and password.';
-    Alert.alert('Log out?', warn, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Log out', style: 'destructive', onPress: () => { onClose(); auth.logout(); } },
-    ]);
+  const [ask, setAsk] = useState(false);
+  const [upgrade, setUpgrade] = useState(false);
+  const [askDel, setAskDel] = useState(false);
+  const [typed, setTyped] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [upgraded, setUpgraded] = useState(false);
+  const confirmLogout = () => setAsk(true);
+  const doLogout = () => { setAsk(false); onClose(); auth.logout(); };
+
+  const closeDelete = () => { setAskDel(false); setTyped(''); };
+  const doDelete = async () => {
+    setDeleting(true);
+    try { await auth.deleteAccount(); setDeleting(false); closeDelete(); onClose(); } catch (e) { setDeleting(false); Alert.alert('Could not delete account', e.message); }
   };
 
   return (
@@ -38,8 +45,38 @@ export default function AccountSheet({ visible, onClose }) {
             <Text style={[T(14, 400, { color: C.muted, lineHeight: 20 })]}>Everything you add is saved to your account, so you will see the same data on any phone you log in on.</Text>
           )}
           <Cta label="Log out" icon="logout" onPress={confirmLogout} />
+          <Pressable accessibilityRole="button" accessibilityLabel="Delete account" onPress={() => setAskDel(true)} style={{ alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 16 }}>
+            <Text style={[T(15, 600, { color: '#D93F2E' })]}>Delete account</Text>
+          </Pressable>
         </Sheet>
       </ScrollView>
+      {u.guest ? (
+        <Popup visible={ask} onClose={() => setAsk(false)} icon="warning" tone="orange" title="Guest account"
+          message="Logging out will permanently delete access to everything in this guest account. Create an account first to keep your data."
+          actions={[{ label: 'Create account', kind: 'navy', onPress: () => { setAsk(false); setUpgrade(true); } },
+            { label: 'Log out anyway', kind: 'ghostRed', onPress: doLogout },
+            { label: 'Cancel', kind: 'ghost', onPress: () => setAsk(false) }]} />
+      ) : (
+        <Popup visible={ask} onClose={() => setAsk(false)} icon="logout" tone="navy" title="Log out?" row
+          message="You'll be signed out of this device. Your data stays safe and will be here when you log back in."
+          actions={[{ label: 'Cancel', kind: 'soft', onPress: () => setAsk(false) }, { label: 'Log out', kind: 'navy', onPress: doLogout }]} />
+      )}
+      <Popup sheet visible={askDel} onClose={closeDelete} icon="warning" tone="red" title="Delete your account?"
+        message="Your entire Ledgero account will be permanently removed. This can't be undone."
+        actions={[{ label: deleting ? 'Deleting…' : 'Delete account', kind: 'red', disabled: typed !== 'DELETE' || deleting, onPress: doDelete }, { label: 'Cancel', kind: 'soft', onPress: closeDelete }]}>
+        <View style={{ gap: 12 }}>
+          {['All entries, budgets and savings are deleted', 'Your vault and reminders are removed too', "This action can't be undone"].map((t) => (
+            <Text key={t} style={[T(15, 400, { color: C.ink, lineHeight: 21 })]}>{'\u2715  '}{t}</Text>
+          ))}
+          <Text style={[T(14, 400, { color: C.muted, marginTop: 6 })]}>Type <Text style={[T(14, 600, { color: C.ink })]}>DELETE</Text> to confirm</Text>
+          <TextInput accessibilityLabel="Type DELETE to confirm" value={typed} onChangeText={setTyped} autoCapitalize="characters" autoCorrect={false}
+            style={[T(17, 500, { color: C.ink, height: 56, borderRadius: 20, borderWidth: 1.5, borderColor: typed ? '#D93F2E' : C.line, paddingHorizontal: 18, letterSpacing: 1 })]} />
+        </View>
+      </Popup>
+      <UpgradeSheet visible={upgrade} onClose={() => setUpgrade(false)} onDone={() => { setUpgrade(false); setUpgraded(true); }} />
+      <Popup visible={upgraded} onClose={() => setUpgraded(false)} icon="check" tone="green" title="Account created"
+        message="Your guest data is now saved to your email. You can log in on any phone."
+        actions={[{ label: 'Done', kind: 'navy', onPress: () => setUpgraded(false) }]} />
     </Modal>
   );
 }

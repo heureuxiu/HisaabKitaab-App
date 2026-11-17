@@ -63,6 +63,8 @@ export const authApi = {
   reset: ({ email, code, password }) => http('/auth/reset', { method: 'POST', body: { email, code, password }, auth: false }),
   google: ({ idToken }) => http('/auth/google', { method: 'POST', body: { idToken }, auth: false }),
   me: () => http('/auth/me'),
+  upgrade: ({ name, email, password }) => http('/auth/upgrade', { method: 'POST', body: { name, email, password } }),
+  deleteAccount: () => http('/auth/me', { method: 'DELETE' }),
 };
 
 export const api = {

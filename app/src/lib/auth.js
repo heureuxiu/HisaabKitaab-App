@@ -71,6 +71,8 @@ export function AuthProvider({ children }) {
     login: async (f) => startSession(await authApi.login(f)),
     guest: async () => startSession(await authApi.guest()),
     reset: async (f) => startSession(await authApi.reset(f)),
+    upgrade: async (f) => startSession(await authApi.upgrade(f)),
+    deleteAccount: async () => { await authApi.deleteAccount(); await logout(); },
     google: async (idToken) => startSession(await authApi.google({ idToken })),
   }), [phase, user, welcomed, logout, startSession]);
 
