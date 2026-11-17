@@ -24,12 +24,14 @@ export default function GetStartedScreen({ onStart, goLogin }) {
       <View style={{ position: 'absolute', right: -120, top: -90, width: 420, height: 420, borderRadius: 210, backgroundColor: 'rgba(43,107,208,0.10)' }} />
       <View style={{ position: 'absolute', left: -140, bottom: -130, width: 420, height: 420, borderRadius: 210, backgroundColor: 'rgba(10,45,140,0.06)' }} />
 
-<Rise delay={0} distance={-14}>      <View style={{ marginTop: insets.top + 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+<Rise delay={0} distance={-14}>
+      <View style={{ marginTop: insets.top + 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
         <Logo size={34} radius={28} id="gs" />
         <Text style={[T(22, 700, { color: C.ink, letterSpacing: -0.6 })]}>Hisaab Kitaab</Text>
       </View></Rise>
 
-<Rise delay={160} distance={44} duration={700}>      <View style={{ height: 340, marginTop: 14 }}>
+<Rise delay={160} distance={44} duration={700}>
+      <View style={{ height: 340, marginTop: 14 }}>
         <LinearGradient colors={['#02154A', '#0A2D8C', '#1E55BF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
           style={[{ position: 'absolute', left: 18, top: 10, width: 262, height: 164, borderRadius: 24, padding: 18, transform: [{ rotate: '-12deg' }] }, shadow('#0A2D8C')]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -49,7 +51,8 @@ export default function GetStartedScreen({ onStart, goLogin }) {
         </LinearGradient>
       </View></Rise>
 
-<Rise delay={380} distance={26}>      <View style={{ paddingHorizontal: 28, marginTop: 14 }}>
+<Rise delay={380} distance={26}>
+      <View style={{ paddingHorizontal: 28, marginTop: 14 }}>
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <Text style={[T(42, 600, { color: C.ink, letterSpacing: -1.4, lineHeight: 54 })]}>Take control{'\n'}of your{'\n'}hisaab</Text>
           <View style={{ flexDirection: 'row', marginLeft: 10, marginBottom: 4 }}>
@@ -59,7 +62,8 @@ export default function GetStartedScreen({ onStart, goLogin }) {
         </View>
       </View></Rise>
 
-<Rise delay={650} distance={30} style={{ position: 'absolute', left: 24, right: 24, bottom: insets.bottom + 22 }}>      <View>
+<Rise delay={650} distance={30} style={{ position: 'absolute', left: 24, right: 24, bottom: insets.bottom + 22 }}>
+      <View>
         <Pressable onPress={onStart} style={({ pressed }) => ({ opacity: pressed ? 0.9 : 1 })}>
           <LinearGradient colors={['#0A2D8C', '#2158D6']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
             style={[{ height: 62, borderRadius: 31, flexDirection: 'row', alignItems: 'center', paddingLeft: 28, paddingRight: 10 }, shadow('#2158D6')]}>
