@@ -66,7 +66,7 @@ export function NotificationsProvider({ children }) {
   const toggleReminder = useCallback(async (key) => {
     const turningOn = !reminders[key];
     if (turningOn && !(await ensurePermission())) {
-      Alert.alert('Notifications are off', 'Allow notifications for Hisaab Kitaab in your phone settings, then try again.');
+      Alert.alert('Notifications are off', 'Allow notifications for Ledgero in your phone settings, then try again.');
       return;
     }
     const next = { ...reminders, [key]: turningOn };

@@ -3,6 +3,7 @@ import { Modal, View, Text, TextInput, Alert, KeyboardAvoidingView, Platform } f
 import { C, T } from '../theme';
 import Icon from '../components/Icon';
 import DatePicker from '../components/DatePicker';
+import Popup, { EntryPreview } from '../components/Popup';
 import { api } from '../lib/api';
 import { CollapseScroll, CompactBar } from '../components/collapse';
 import { TopBar, GlassBtn, Seg, GlassPill, Sheet, InfoRow, Cta } from '../components/ui';
@@ -19,6 +20,8 @@ export default function SavingsMoveSheet({ visible, move, initialType = 'add', b
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [pickDate, setPickDate] = useState(false);
+  const [askDelete, setAskDelete] = useState(false);
+  const [askDiscard, setAskDiscard] = useState(false);
 
   useEffect(() => {
     if (!visible) return;
@@ -44,24 +47,26 @@ export default function SavingsMoveSheet({ visible, move, initialType = 'add', b
     } catch (e) { Alert.alert('Could not save', e.message); setBusy(false); }
   }
 
-  function onDelete() {
-    Alert.alert('Delete this entry?', `PKR ${money(move.amount)}`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => {
-        try { await api.deleteMove(move.moveId); onSaved(); onClose(); } catch (e) { Alert.alert('Could not delete', e.message); }
-      } },
-    ]);
+  const dirty = move
+    ? (type !== move.type || n !== move.amount || date !== move.date || note.trim() !== (move.note || '').trim())
+    : (n > 0 || note.trim() !== '');
+  const requestClose = () => { if (dirty && !busy) setAskDiscard(true); else onClose(); };
+
+  function onDelete() { setAskDelete(true); }
+  async function doDelete() {
+    setAskDelete(false);
+    try { await api.deleteMove(move.moveId); onSaved(); onClose(); } catch (e) { Alert.alert('Could not delete', e.message); }
   }
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" onRequestClose={requestClose}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <CollapseScroll h={430}
-          compact={<CompactBar left={<GlassBtn size={42} icon="close" label="Close" onPress={onClose} />}
+          compact={<CompactBar left={<GlassBtn size={42} icon="close" label="Close" onPress={requestClose} />}
             title={`PKR ${money(Number(amount) || 0)}`} sub={move ? 'Edit savings entry' : isAdd ? 'Add savings' : 'Use savings'}
             right={<GlassBtn size={42} icon="calendar" label="Pick date" onPress={() => setPickDate(true)} />} />}
           header={<>
-            <TopBar left={<GlassBtn icon="close" label="Close" onPress={onClose} />} title={move ? 'Edit savings entry' : isAdd ? 'Add savings' : 'Use savings'}
+            <TopBar left={<GlassBtn icon="close" label="Close" onPress={requestClose} />} title={move ? 'Edit savings entry' : isAdd ? 'Add savings' : 'Use savings'}
               right={<GlassBtn icon="calendar" label="Pick date" onPress={() => setPickDate(true)} />} />
             <View style={{ marginTop: 20 }}><Seg options={OPTIONS} value={type} onChange={setType} /></View>
             <View style={{ marginTop: 26, alignItems: 'center' }}>
@@ -98,6 +103,17 @@ export default function SavingsMoveSheet({ visible, move, initialType = 'add', b
               icon={move ? 'trash' : isAdd ? 'plus' : 'minus'} onIcon={move ? onDelete : onSave} />
           </Sheet>
         </CollapseScroll>
+        {move && (
+          <Popup sheet visible={askDelete} onClose={() => setAskDelete(false)} icon="trash" tone="red" title="Delete this entry?"
+            message="This savings entry will be removed and your savings balance will be recalculated. This can't be undone."
+            actions={[{ label: 'Yes, delete', kind: 'red', onPress: doDelete }, { label: 'Keep it', kind: 'soft', onPress: () => setAskDelete(false) }]}>
+            <EntryPreview icon="vault" fg="#2158D6" tint="#E6EDFB" title={move.type === 'add' ? 'Added to savings' : 'Used from savings'} sub={dayLong(move.date)}
+              amount={`${move.type === 'add' ? '+' : '-'} PKR ${money(move.amount)}`} />
+          </Popup>
+        )}
+        <Popup visible={askDiscard} onClose={() => setAskDiscard(false)} icon="pencil" tone="navy" title="Discard changes?"
+          message="You have unsaved changes. If you leave now, they'll be lost."
+          actions={[{ label: 'Keep editing', kind: 'navy', onPress: () => setAskDiscard(false) }, { label: 'Discard', kind: 'ghostRed', onPress: () => { setAskDiscard(false); onClose(); } }]} />
         <DatePicker visible={pickDate} value={date} onPick={(d) => { setDate(d); setPickDate(false); }} onClose={() => setPickDate(false)} />
       </KeyboardAvoidingView>
     </Modal>

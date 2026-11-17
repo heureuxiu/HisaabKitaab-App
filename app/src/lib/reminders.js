@@ -43,7 +43,7 @@ const dailyTrigger = (hour, minute) => (types.DAILY ? { type: types.DAILY, hour,
 const dateTrigger = (date) => (types.DATE ? { type: types.DATE, date, channelId: CHANNEL } : { date, channelId: CHANNEL });
 
 async function schedule(identifier, body, trigger) {
-  await Notifications.scheduleNotificationAsync({ identifier, content: { title: 'Hisaab Kitaab', body, sound: false }, trigger });
+  await Notifications.scheduleNotificationAsync({ identifier, content: { title: 'Ledgero', body, sound: false }, trigger });
 }
 
 /**
