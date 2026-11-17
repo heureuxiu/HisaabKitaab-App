@@ -1,6 +1,6 @@
 # Hisaab Kitaab
 
-Personal finance tracker for two phones: income, savings, expenses and what is left.
+Personal finance tracker : income, savings, expenses and what is left.
 `remaining = income − savings − expenses`
 
 ```
