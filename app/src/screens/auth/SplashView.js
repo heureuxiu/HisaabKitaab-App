@@ -1,69 +1,78 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, Easing } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Animated, Easing } from 'react-native';
 import { T } from '../../theme';
-import Logo from '../../components/Logo';
+import { LogoMark } from '../../components/Logo';
 
-export const SPLASH_MS = 3200;
-const RINGS = [210, 310, 430, 570];
+export const SPLASH_MS = 2800;
+const NAME = 'Ledgero'.split('');
 
-/** About three seconds: rings ripple out, the logo springs in, the name and tagline rise, a bar fills. */
+/**
+ * Plain white screen with the Ledgero logo, animated:
+ * a soft ring ripples out, the mark springs in with a small turn, the letters of the name pop in one by one,
+ * then the whole logo breathes gently until the app is ready.
+ */
 export default function SplashView() {
-  const logo = useRef(new Animated.Value(0)).current;
-  const title = useRef(new Animated.Value(0)).current;
-  const tag = useRef(new Animated.Value(0)).current;
-  const foot = useRef(new Animated.Value(0)).current;
-  const bar = useRef(new Animated.Value(0)).current;
-  const pulse = useRef(new Animated.Value(0)).current;
-  const ripple = useRef(RINGS.map(() => new Animated.Value(0))).current;
+  const ring = useRef(new Animated.Value(0)).current;
+  const ring2 = useRef(new Animated.Value(0)).current;
+  const mark = useRef(new Animated.Value(0)).current;
+  const letters = useRef(NAME.map(() => new Animated.Value(0))).current;
+  const breathe = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const out = Easing.out(Easing.cubic);
-    const loops = ripple.map((v, i) => Animated.loop(Animated.sequence([
-      Animated.delay(i * 420),
-      Animated.timing(v, { toValue: 1, duration: 2200, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-      Animated.timing(v, { toValue: 0, duration: 0, useNativeDriver: true }),
-    ])));
-    loops.forEach((l) => l.start());
-    const pl = Animated.loop(Animated.sequence([
-      Animated.timing(pulse, { toValue: 1, duration: 1100, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      Animated.timing(pulse, { toValue: 0, duration: 1100, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(breathe, { toValue: 1, duration: 1200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      Animated.timing(breathe, { toValue: 0, duration: 1200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
     ]));
-    const seq = Animated.parallel([
-      Animated.sequence([Animated.delay(150), Animated.spring(logo, { toValue: 1, friction: 6, tension: 60, useNativeDriver: true })]),
-      Animated.sequence([Animated.delay(750), Animated.timing(title, { toValue: 1, duration: 650, easing: out, useNativeDriver: true })]),
-      Animated.sequence([Animated.delay(1150), Animated.timing(tag, { toValue: 1, duration: 650, easing: out, useNativeDriver: true })]),
-      Animated.sequence([Animated.delay(1500), Animated.timing(foot, { toValue: 1, duration: 700, useNativeDriver: true })]),
-      Animated.sequence([Animated.delay(500), Animated.timing(bar, { toValue: 1, duration: SPLASH_MS - 700, easing: Easing.inOut(Easing.cubic), useNativeDriver: false })]),
+    const intro = Animated.parallel([
+      Animated.timing(ring, { toValue: 1, duration: 1400, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+      Animated.sequence([Animated.delay(350), Animated.timing(ring2, { toValue: 1, duration: 1400, easing: Easing.out(Easing.quad), useNativeDriver: true })]),
+      Animated.sequence([Animated.delay(150), Animated.spring(mark, { toValue: 1, friction: 5, tension: 70, useNativeDriver: true })]),
+      ...letters.map((v, i) => Animated.sequence([
+        Animated.delay(650 + i * 80),
+        Animated.spring(v, { toValue: 1, friction: 7, tension: 90, useNativeDriver: true }),
+      ])),
     ]);
-    seq.start(() => pl.start());
-    return () => { loops.forEach((l) => l.stop()); pl.stop(); seq.stop(); };
-  }, [logo, title, tag, foot, bar, pulse, ripple]);
+    intro.start(() => loop.start());
+    return () => { intro.stop(); loop.stop(); };
+  }, [ring, ring2, mark, letters, breathe]);
 
-  const rise = (v, d = 18) => ({ opacity: v, transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [d, 0] }) }] });
+  const ripple = (v, size) => (
+    <Animated.View pointerEvents="none" style={{
+      position: 'absolute', left: -size / 2, top: -size / 2, width: size, height: size, borderRadius: size / 2,
+      borderWidth: 1.5, borderColor: '#2B6BD0',
+      opacity: v.interpolate({ inputRange: [0, 0.2, 1], outputRange: [0, 0.35, 0] }),
+      transform: [{ scale: v.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1.3] }) }],
+    }} />
+  );
 
   return (
-    <LinearGradient colors={['#010C2E', '#071F6B', '#0F3FA8', '#2B6BD0']} locations={[0, 0.42, 0.78, 1]} style={{ flex: 1, alignItems: 'center' }}>
-      <View style={{ position: 'absolute', top: '31%' }} pointerEvents="none">
-        {RINGS.map((d, i) => (
-          <Animated.View key={d} style={{
-            position: 'absolute', left: -d / 2, top: -d / 2, width: d, height: d, borderRadius: d / 2, borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)',
-            opacity: ripple[i].interpolate({ inputRange: [0, 0.2, 1], outputRange: [0, 0.9, 0] }),
-            transform: [{ scale: ripple[i].interpolate({ inputRange: [0, 1], outputRange: [0.55, 1.08] }) }],
-          }} />
-        ))}
-      </View>
-      <Animated.View style={{ marginTop: '22%', opacity: logo, transform: [{ scale: logo.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) }, { rotate: logo.interpolate({ inputRange: [0, 1], outputRange: ['-14deg', '0deg'] }) }] }}>
-        <Animated.View style={{ padding: 14, borderRadius: 50, backgroundColor: 'rgba(255,255,255,0.10)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)', transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.04] }) }] }}>
-          <Logo size={116} id="sp" />
-        </Animated.View>
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' }}>
+      <Animated.View style={{ flexDirection: 'row', alignItems: 'center', marginTop: -20, transform: [{ scale: breathe.interpolate({ inputRange: [0, 1], outputRange: [1, 1.025] }) }] }}>
+        <View style={{ width: 68, height: 68, marginRight: 14, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ position: 'absolute', left: 34, top: 34 }}>{ripple(ring, 230)}{ripple(ring2, 230)}</View>
+          <Animated.View style={{
+            opacity: mark,
+            transform: [
+              { scale: mark.interpolate({ inputRange: [0, 1], outputRange: [0.2, 1] }) },
+              { rotate: mark.interpolate({ inputRange: [0, 1], outputRange: ['-16deg', '0deg'] }) },
+            ],
+          }}>
+            <LogoMark size={68} id="sp" />
+          </Animated.View>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          {NAME.map((ch, i) => (
+            <Animated.Text key={i} style={[T(50, 700, { color: '#02154A', letterSpacing: -2 }), {
+              opacity: letters[i],
+              transform: [
+                { translateY: letters[i].interpolate({ inputRange: [0, 1], outputRange: [26, 0] }) },
+                { scale: letters[i].interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }) },
+              ],
+            }]}>{ch}</Animated.Text>
+          ))}
+        </View>
       </Animated.View>
-      <Animated.Text style={[T(40, 700, { color: '#FFFFFF', letterSpacing: -1.4, marginTop: 38 }), rise(title, 26)]}>Hisaab Kitaab</Animated.Text>
-      <Animated.Text style={[T(16, 500, { color: 'rgba(255,255,255,0.7)', marginTop: 14 }), rise(tag)]}>Income, savings, kharcha. Sab ek jagah.</Animated.Text>
-      <View style={{ width: 120, height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden', marginTop: 40 }}>
-        <Animated.View style={{ width: bar.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }), height: '100%', borderRadius: 3, backgroundColor: '#FFFFFF' }} />
-      </View>
-      <Animated.Text style={[T(13, 500, { color: 'rgba(255,255,255,0.78)', position: 'absolute', bottom: 48 }), { opacity: foot }]}>Your money, your own phone</Animated.Text>
-    </LinearGradient>
+    </View>
   );
 }

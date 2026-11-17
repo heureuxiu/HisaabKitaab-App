@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Logo from '../../components/Logo';
+import { LogoMark } from '../../components/Logo';
 import { Rises } from '../../components/anim';
-import { useAuth } from '../../lib/auth';
 import { authApi } from '../../lib/api';
 import { T, C } from '../../theme';
 import Icon from '../../components/Icon';
+import Popup from '../../components/Popup';
 import { AuthTitle, AuthField, DarkButton, LinkLine, ErrorText } from './parts';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-// Step 1: enter email, we send a 6-digit code. Step 2: enter the code and a new password, then you are logged in.
+// Step 1: enter email, we send a 6-digit code. Step 2: enter the code and a new password; a popup confirms and sends you to Log in.
 export default function ForgotScreen({ goBack }) {
-  const auth = useAuth();
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
@@ -22,6 +21,7 @@ export default function ForgotScreen({ goBack }) {
   const [confirm, setConfirm] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [done, setDone] = useState(false);
 
   const sendCode = async () => {
     if (!EMAIL_RE.test(email.trim())) return setError('Enter a valid email address');
@@ -37,7 +37,7 @@ export default function ForgotScreen({ goBack }) {
     if (password !== confirm) return setError('The two passwords do not match');
     setError('');
     setBusy(true);
-    try { await auth.reset({ email: email.trim(), code: code.trim(), password }); } catch (e) { setError(e.message); setBusy(false); }
+    try { await authApi.reset({ email: email.trim(), code: code.trim(), password }); setBusy(false); setDone(true); } catch (e) { setError(e.message); setBusy(false); }
   };
 
   return (
@@ -47,7 +47,7 @@ export default function ForgotScreen({ goBack }) {
         <Pressable onPress={step === 2 ? () => { setStep(1); setError(''); } : goBack} accessibilityLabel="Back" style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#F1F3F6', alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="chevL" size={22} color={C.ink} strokeWidth={1.8} />
         </Pressable>
-<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 2 }}><Logo size={34} radius={28} id="au" /><Text style={[T(22, 700, { color: C.ink, letterSpacing: -0.6 })]}>Hisaab Kitaab</Text></View>
+<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 2 }}><LogoMark size={34} id="au" /><Text style={[T(24, 700, { color: '#02154A', letterSpacing: -0.9 })]}>Ledgero</Text></View>
         <AuthTitle>{step === 1 ? 'Forgot password' : 'New password'}</AuthTitle>
         <Text style={[T(14, 400, { color: C.muted, textAlign: 'center', lineHeight: 20, paddingHorizontal: 8 })]}>
           {step === 1 ? 'Enter your email and we will send you a 6-digit code.' : `We sent a code to ${email.trim()}. It works for 15 minutes.`}
@@ -74,6 +74,9 @@ export default function ForgotScreen({ goBack }) {
         <LinkLine text="Remembered it?" action="Log in" onPress={goBack} />
       </Rises>
 </ScrollView>
+      <Popup visible={done} onClose={() => { setDone(false); goBack(); }} icon="check" tone="green" title="Password updated"
+        message="Your new password is set. Log in with it to continue."
+        actions={[{ label: 'Log in', kind: 'navy', onPress: () => { setDone(false); goBack(); } }]} />
     </KeyboardAvoidingView>
   );
 }

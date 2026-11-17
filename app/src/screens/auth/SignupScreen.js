@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Logo from '../../components/Logo';
+import { LogoMark } from '../../components/Logo';
 import { Rises } from '../../components/anim';
 import { useAuth } from '../../lib/auth';
 import { T, C } from '../../theme';
@@ -49,7 +49,7 @@ export default function SignupScreen({ goBack, goLogin }) {
         <Pressable onPress={goBack} accessibilityLabel="Back" style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#F1F3F6', alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="chevL" size={22} color={C.ink} strokeWidth={1.8} />
         </Pressable>
-<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 2 }}><Logo size={34} radius={28} id="au" /><Text style={[T(22, 700, { color: C.ink, letterSpacing: -0.6 })]}>Hisaab Kitaab</Text></View>
+<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 2 }}><LogoMark size={34} id="au" /><Text style={[T(24, 700, { color: '#02154A', letterSpacing: -0.9 })]}>Ledgero</Text></View>
         <AuthTitle>Sign up</AuthTitle>
         <View style={{ height: 6 }} />
         <AuthField icon="user" placeholder="Full name" value={name} onChangeText={setName} autoCapitalize="words" autoComplete="name" textContentType="name" />

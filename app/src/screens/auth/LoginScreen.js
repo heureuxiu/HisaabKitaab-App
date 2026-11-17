@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Logo from '../../components/Logo';
+import { LogoMark } from '../../components/Logo';
 import { Rises } from '../../components/anim';
 import { useAuth } from '../../lib/auth';
 import { T, C } from '../../theme';
@@ -30,7 +30,7 @@ export default function LoginScreen({ goCreate, goForgot }) {
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#FFFFFF' }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + 56, paddingBottom: insets.bottom + 30, paddingHorizontal: 22, gap: 14 }}>
 <Rises>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 2 }}><Logo size={34} radius={28} id="au" /><Text style={[T(22, 700, { color: C.ink, letterSpacing: -0.6 })]}>Hisaab Kitaab</Text></View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 2 }}><LogoMark size={34} id="au" /><Text style={[T(24, 700, { color: '#02154A', letterSpacing: -0.9 })]}>Ledgero</Text></View>
         <AuthTitle>Login</AuthTitle>
         <View style={{ height: 8 }} />
         <AuthField icon="mail" placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoComplete="email" textContentType="emailAddress" returnKeyType="next" />
