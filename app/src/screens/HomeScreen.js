@@ -24,9 +24,9 @@ export default function HomeScreen({ navigation }) {
   return (
     <CollapseScroll h={440}
       refreshControl={<RefreshControl refreshing={L.loading} onRefresh={L.refresh} tintColor="#0A2D8C" progressViewOffset={40} />}
-      compact={<CompactBar left={<GlassBtn size={42} icon="user" label="Account" onPress={openSettings} />}
+      compact={<CompactBar left={<GlassBtn size={50} icon="user" label="Account" onPress={openSettings} />}
         title={`PKR ${rem < 0 ? '−' : ''}${money(Math.abs(rem))}`} sub={thisMonth ? 'Remaining this month' : `Remaining in ${monthShort(L.month)}`}
-        right={<GlassBtn size={42} icon="bell" label="Notifications" dot={N.unreadCount > 0} onPress={N.open} />} />}
+        right={<GlassBtn size={50} icon="bell" label="Notifications" dot={N.unreadCount > 0} onPress={N.open} />} />}
       header={<>
         <TopBar left={<GlassBtn icon="user" label="Account" onPress={openSettings} />}
           right={<GlassBtn icon="bell" label={N.unreadCount ? `Notifications, ${N.unreadCount} new` : 'Notifications'} dot={N.unreadCount > 0} onPress={N.open} />} />

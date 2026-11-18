@@ -60,11 +60,11 @@ export default function SavingsMoveSheet({ visible, move, initialType = 'add', b
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={requestClose}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <KeyboardAvoidingView behavior={'padding'} style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <CollapseScroll h={430}
-          compact={<CompactBar left={<GlassBtn size={42} icon="close" label="Close" onPress={requestClose} />}
+          compact={<CompactBar left={<GlassBtn size={50} icon="close" label="Close" onPress={requestClose} />}
             title={`PKR ${money(Number(amount) || 0)}`} sub={move ? 'Edit savings entry' : isAdd ? 'Add savings' : 'Use savings'}
-            right={<GlassBtn size={42} icon="calendar" label="Pick date" onPress={() => setPickDate(true)} />} />}
+            right={<GlassBtn size={50} icon="calendar" label="Pick date" onPress={() => setPickDate(true)} />} />}
           header={<>
             <TopBar left={<GlassBtn icon="close" label="Close" onPress={requestClose} />} title={move ? 'Edit savings entry' : isAdd ? 'Add savings' : 'Use savings'}
               right={<GlassBtn icon="calendar" label="Pick date" onPress={() => setPickDate(true)} />} />

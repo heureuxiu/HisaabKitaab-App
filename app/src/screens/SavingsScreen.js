@@ -51,9 +51,9 @@ export default function SavingsScreen({ navigation }) {
   return (
     <CollapseScroll h={440}
       refreshControl={<RefreshControl refreshing={loading} onRefresh={load} tintColor="#0A2D8C" progressViewOffset={40} />}
-      compact={<CompactBar left={<GlassBtn size={42} icon="back" label="Back" onPress={() => navigation.navigate('Home')} />}
+      compact={<CompactBar left={<GlassBtn size={50} icon="back" label="Back" onPress={() => navigation.navigate('Home')} />}
         title={`PKR ${money(data.balance)}`} sub={`Added +${money(data.added)}   Used ${'−'}${money(data.used)}`}
-        right={<GlassBtn size={42} icon="info" label="About savings" onPress={() => Alert.alert('Savings', INFO)} />} />}
+        right={<GlassBtn size={50} icon="info" label="About savings" onPress={() => Alert.alert('Savings', INFO)} />} />}
       header={<>
         <TopBar left={<GlassBtn icon="back" label="Back" onPress={() => navigation.navigate('Home')} />} title="Savings"
           right={<GlassBtn icon="info" label="About savings" onPress={() => Alert.alert('Savings', INFO)} />} />

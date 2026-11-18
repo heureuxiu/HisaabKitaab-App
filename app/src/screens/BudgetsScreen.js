@@ -58,10 +58,10 @@ export default function BudgetsScreen({ navigation }) {
   return (
     <CollapseScroll h={440}
       refreshControl={<RefreshControl refreshing={L.loading} onRefresh={L.refresh} tintColor="#0A2D8C" progressViewOffset={40} />}
-      compact={<CompactBar left={<GlassBtn size={42} icon="back" label="Previous month" onPress={() => L.setMonth(shiftMonth(L.month, -1))} />}
+      compact={<CompactBar left={<GlassBtn size={50} icon="back" label="Previous month" onPress={() => L.setMonth(shiftMonth(L.month, -1))} />}
         title={totalLimit > 0 ? `${left >= 0 ? 'Left' : 'Over'} PKR ${money(Math.abs(left))}` : `Spent PKR ${money(L.summary.spent)}`}
         sub={totalLimit > 0 ? `${usedPct}% of ${money(totalLimit)} used` : 'Budgets'}
-        right={<GlassBtn size={42} icon="calendar" label="Pick month" onPress={() => setPicker(true)} />} />}
+        right={<GlassBtn size={50} icon="calendar" label="Pick month" onPress={() => setPicker(true)} />} />}
       header={<>
         <TopBar left={<GlassBtn icon="back" label="Previous month" onPress={() => L.setMonth(shiftMonth(L.month, -1))} />}
           title="Budgets" onTitlePress={() => setPicker(true)}

@@ -28,9 +28,9 @@ export default function ReportsScreen({ navigation }) {
   return (
     <CollapseScroll h={560}
       refreshControl={<RefreshControl refreshing={L.loading} onRefresh={L.refresh} tintColor="#0A2D8C" progressViewOffset={40} />}
-      compact={<CompactBar left={<GlassBtn size={42} icon="back" label="Back" onPress={() => navigation.navigate('Home')} />}
+      compact={<CompactBar left={<GlassBtn size={50} icon="back" label="Back" onPress={() => navigation.navigate('Home')} />}
         title={`Spent PKR ${money(L.summary.spent)}`} sub={`${monthShort(L.month)}${cats[0] ? `  ·  Top: ${cats[0].label}` : ''}`}
-        right={<GlassBtn size={42} icon="calendar" label="Pick month" onPress={() => setPicker(true)} />} />}
+        right={<GlassBtn size={50} icon="calendar" label="Pick month" onPress={() => setPicker(true)} />} />}
       header={<>
         {cats.length > 0 ? <Bubbles items={cats} topOffset={extra} /> : (
           <View style={{ position: 'absolute', left: 40, right: 40, top: 230 + extra, alignItems: 'center', gap: 10 }}>

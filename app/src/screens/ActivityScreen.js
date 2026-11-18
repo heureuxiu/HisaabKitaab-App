@@ -34,9 +34,9 @@ export default function ActivityScreen() {
   return (
     <CollapseScroll h={330}
       refreshControl={<RefreshControl refreshing={L.loading} onRefresh={L.refresh} tintColor="#0A2D8C" progressViewOffset={40} />}
-      compact={<CompactBar left={<GlassBtn size={42} icon="back" label="Previous month" onPress={() => L.setMonth(shiftMonth(L.month, -1))} />}
+      compact={<CompactBar left={<GlassBtn size={50} icon="back" label="Previous month" onPress={() => L.setMonth(shiftMonth(L.month, -1))} />}
         title={monthTitle(L.month)} sub={`+${money(tot.inc)}   ${'−'}${money(tot.out)}`}
-        right={<GlassBtn size={42} icon="calendar" label="Pick month" onPress={() => setPicker(true)} />} />}
+        right={<GlassBtn size={50} icon="calendar" label="Pick month" onPress={() => setPicker(true)} />} />}
       header={<>
         <TopBar left={<GlassBtn icon="back" label="Previous month" onPress={() => L.setMonth(shiftMonth(L.month, -1))} />}
           title={monthTitle(L.month)} onTitlePress={() => setPicker(true)}

@@ -16,13 +16,15 @@ const SAVE_LABEL = { income: 'Save income', expense: 'Save expense', savings: 'S
 /** Big amount typed straight into the hero (design: 60px, dim PKR prefix). */
 export function AmountInput({ amount, onChange }) {
   const n = Number(amount) || 0;
+  const len = amount ? money(n).length : 1;
+  const fs = len <= 7 ? 60 : len <= 9 ? 48 : len <= 11 ? 40 : 34;
   return (
     <View style={{ alignItems: 'center', marginTop: 9 }}>
       <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center', gap: 6 }}>
-        <Text style={[T(25, 500, { color: C.onDarkSoft, letterSpacing: -0.5 })]}>PKR</Text>
+        <Text style={[T(Math.round(fs * 0.42), 500, { color: C.onDarkSoft, letterSpacing: -0.5 })]}>PKR</Text>
         <TextInput accessibilityLabel="Amount" value={amount ? money(n) : ''} onChangeText={(t) => onChange(t.replace(/[^0-9]/g, '').slice(0, 10))}
           keyboardType="number-pad" placeholder="0" placeholderTextColor="rgba(255,255,255,0.35)"
-          style={[T(60, 500, { color: '#FFFFFF', letterSpacing: -3.3, padding: 0, minWidth: 150, textAlign: 'center', height: 70 })]} />
+          style={[T(fs, 500, { color: '#FFFFFF', letterSpacing: -fs * 0.055, padding: 0, minWidth: 110, textAlign: 'center', height: 70 })]} />
       </View>
     </View>
   );
@@ -80,11 +82,11 @@ export default function AddSheet({ visible, entry, initialType = 'expense', onCl
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={requestClose}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <KeyboardAvoidingView behavior={'padding'} style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <CollapseScroll h={430}
-          compact={<CompactBar left={<GlassBtn size={42} icon="close" label="Close" onPress={requestClose} />}
+          compact={<CompactBar left={<GlassBtn size={50} icon="close" label="Close" onPress={requestClose} />}
             title={`PKR ${money(Number(amount) || 0)}`} sub={entry ? 'Edit entry' : 'Add entry'}
-            right={<GlassBtn size={42} icon="calendar" label="Pick date" onPress={() => setPickDate(true)} />} />}
+            right={<GlassBtn size={50} icon="calendar" label="Pick date" onPress={() => setPickDate(true)} />} />}
           header={<>
             <TopBar left={<GlassBtn icon="close" label="Close" onPress={requestClose} />} title={entry ? 'Edit entry' : 'Add entry'}
               right={<GlassBtn icon="calendar" label="Pick date" onPress={() => setPickDate(true)} />} />
