@@ -3,6 +3,8 @@ import { View, Text, TextInput } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ClerkProvider } from '@clerk/expo';
+import { tokenCache } from '@clerk/expo/token-cache';
 import { StatusBar } from 'expo-status-bar';
 import {
   useFonts,
@@ -33,6 +35,21 @@ import { FadeIn, withFocusRise } from './src/components/anim';
 // Respect the phone's font size setting, but not beyond what the layouts can hold.
 Text.defaultProps = { ...(Text.defaultProps || {}), maxFontSizeMultiplier: 1.2 };
 TextInput.defaultProps = { ...(TextInput.defaultProps || {}), maxFontSizeMultiplier: 1.2 };
+
+// Clerk handles sign-up and login. Its publishable key (starts with pk_) is not a secret; it goes in eas.json and app/.env.
+const CLERK_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
+const clerkReady = CLERK_KEY.startsWith('pk_');
+
+function MissingKey() {
+  return (
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+      <Text style={{ fontSize: 20, fontWeight: '700', color: C.ink, textAlign: 'center' }}>Clerk is not set up</Text>
+      <Text style={{ fontSize: 15, color: C.muted, textAlign: 'center', marginTop: 10, lineHeight: 22 }}>
+        Add EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY (the pk_ key from the Clerk Dashboard) to eas.json and app/.env, then restart.
+      </Text>
+    </View>
+  );
+}
 
 const Tab = createBottomTabNavigator();
 const Home = withFocusRise(HomeScreen);
@@ -97,7 +114,11 @@ export default function App() {
   });
   return (
     <SafeAreaProvider>
-      {loaded ? <AuthProvider><Gate /></AuthProvider> : <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />}
+      {!loaded ? <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} /> : !clerkReady ? <MissingKey /> : (
+        <ClerkProvider publishableKey={CLERK_KEY} tokenCache={tokenCache}>
+          <AuthProvider><Gate /></AuthProvider>
+        </ClerkProvider>
+      )}
     </SafeAreaProvider>
   );
 }

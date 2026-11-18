@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import * as local from './localStore';
 
 const PORT = 4000;
 
@@ -17,12 +18,14 @@ export async function loadConfig() {
   return active;
 }
 
-let token = null;
+// Clerk hands out short-lived session tokens, so one is asked for on every request instead of being stored.
+let tokenGetter = null;
 let onUnauthorized = null;
-/** The login token is added to every /api request. */
-export const setToken = (t) => { token = t || null; };
+let mode = 'remote'; // 'remote' = signed in, data on the server. 'local' = guest, data on this phone only.
+export const setTokenGetter = (fn) => { tokenGetter = fn || null; };
 /** Called when the server says the saved login is no longer valid (expired or removed). */
 export const setUnauthorizedHandler = (fn) => { onUnauthorized = fn; };
+export const setApiMode = (m) => { mode = m; };
 
 // A free hosting plan can need up to a minute to wake the server after it has been idle.
 const TIMEOUT_MS = 45000;
@@ -32,7 +35,8 @@ async function http(path, { method = 'GET', body, auth = true } = {}) {
   const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
   try {
     const headers = { 'content-type': 'application/json' };
-    if (auth && token) headers.authorization = `Bearer ${token}`;
+    const token = auth && tokenGetter ? await tokenGetter() : null;
+    if (token) headers.authorization = `Bearer ${token}`;
     const res = await fetch(`${active.url}${path}`, {
       method,
       headers,
@@ -41,7 +45,7 @@ async function http(path, { method = 'GET', body, auth = true } = {}) {
     });
     if (res.status === 204) return null;
     const data = await res.json().catch(() => ({}));
-    if (res.status === 401 && auth && token && onUnauthorized) onUnauthorized();
+    if (res.status === 401 && token && onUnauthorized) onUnauthorized();
     if (!res.ok) throw new Error(data.error || `Server error (${res.status})`);
     return data;
   } catch (e) {
@@ -56,18 +60,13 @@ async function http(path, { method = 'GET', body, auth = true } = {}) {
 const request = (path, opts) => http(`/api${path}`, opts);
 
 export const authApi = {
-  signup: ({ name, email, password }) => http('/auth/signup', { method: 'POST', body: { name, email, password }, auth: false }),
-  login: ({ email, password }) => http('/auth/login', { method: 'POST', body: { email, password }, auth: false }),
-  guest: () => http('/auth/guest', { method: 'POST', auth: false }),
-  forgot: ({ email }) => http('/auth/forgot', { method: 'POST', body: { email }, auth: false }),
-  reset: ({ email, code, password }) => http('/auth/reset', { method: 'POST', body: { email, code, password }, auth: false }),
-  google: ({ idToken }) => http('/auth/google', { method: 'POST', body: { idToken }, auth: false }),
   me: () => http('/auth/me'),
-  upgrade: ({ name, email, password }) => http('/auth/upgrade', { method: 'POST', body: { name, email, password } }),
   deleteAccount: () => http('/auth/me', { method: 'DELETE' }),
+  /** A guest's ledger, sent once to the server when they create an account. */
+  importData: (data) => request('/import', { method: 'POST', body: data }),
 };
 
-export const api = {
+const remote = {
   entries: (month) => request(`/entries?month=${month}`),
   summary: (month) => request(`/summary?month=${month}`),
   history: (month, months = 6) => request(`/history?month=${month}&months=${months}`),
@@ -83,3 +82,8 @@ export const api = {
   updateMove: (id, m) => request(`/vault/moves/${id}`, { method: 'PUT', body: m }),
   deleteMove: (id) => request(`/vault/moves/${id}`, { method: 'DELETE' }),
 };
+
+// Every screen calls `api.something()`. Signed in, it goes to the server; as a guest, to the store on this phone.
+export const api = Object.fromEntries(
+  Object.keys(remote).map((k) => [k, (...args) => (mode === 'local' ? local : remote)[k](...args)]),
+);
