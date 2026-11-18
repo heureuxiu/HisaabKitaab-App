@@ -9,7 +9,8 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://hisaabkitaab-backend-anky.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://hisaabkitaab-backend-anky.onrender.com",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_dXNlZnVsLXN0YWctNzg5NS5jbGVyay5hY2NvdW50cy5kZXYk"
       }
     },
     "production": {
@@ -17,7 +18,8 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://hisaabkitaab-backend-anky.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://hisaabkitaab-backend-anky.onrender.com",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_dXNlZnVsLXN0YWctNzg5NS5jbGVyay5hY2NvdW50cy5kZXYk"
       }
     }
   }

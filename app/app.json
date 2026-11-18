@@ -32,7 +32,9 @@
         "expo-build-properties",
         {
           "android": {
-            "buildArchs": ["arm64-v8a"],
+            "buildArchs": [
+              "arm64-v8a"
+            ],
             "enableMinifyInReleaseBuild": true,
             "enableShrinkResourcesInReleaseBuild": true
           }
@@ -45,13 +47,17 @@
         {
           "backgroundColor": "#FFFFFF"
         }
-      ]
+      ],
+      "expo-secure-store",
+      "@clerk/expo",
+      "expo-web-browser"
     ],
     "owner": "umarijaz01",
     "extra": {
       "eas": {
         "projectId": "643ba458-e2e7-4cbb-9d03-57ebef85332a"
       }
-    }
+    },
+    "scheme": "ledgero"
   }
 }
