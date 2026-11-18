@@ -75,3 +75,42 @@ export function OrLine() {
     </View>
   );
 }
+
+/**
+ * "Check your email" step: Clerk has emailed a 6-digit code. onVerify(code) and onResend() may throw an Error;
+ * its message is shown under the field.
+ */
+export function CodeStep({ email, onVerify, onResend, onBack }) {
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [note, setNote] = useState('');
+
+  const submit = async () => {
+    if (!/^\d{6}$/.test(code.trim())) return setError('Enter the 6-digit code from your email');
+    setError(''); setNote(''); setBusy(true);
+    try { await onVerify(code); } catch (e) { setError(e.message); setBusy(false); }
+  };
+  const resend = async () => {
+    setError(''); setNote('');
+    try { await onResend(); setNote('We sent a new code.'); } catch (e) { setError(e.message); }
+  };
+
+  return (
+    <View style={{ gap: 14 }}>
+      <AuthTitle>Check your email</AuthTitle>
+      <Text style={[T(14, 400, { color: C.muted, textAlign: 'center', lineHeight: 20, paddingHorizontal: 8 })]}>
+        We sent a 6-digit code to {email.trim()}.
+      </Text>
+      <View style={{ height: 4 }} />
+      <AuthField icon="lock" placeholder="6-digit code" value={code} onChangeText={(t) => setCode(t.replace(/\D/g, '').slice(0, 6))} keyboardType="number-pad" maxLength={6} textContentType="oneTimeCode" autoComplete="one-time-code" returnKeyType="go" onSubmitEditing={submit} />
+      <ErrorText>{error}</ErrorText>
+      {note ? <Text style={[T(14, 500, { color: C.green, textAlign: 'center' })]}>{note}</Text> : null}
+      <DarkButton label="Verify" onPress={submit} loading={busy} />
+      <Pressable onPress={resend} hitSlop={8} style={{ alignSelf: 'center' }}>
+        <Text style={[T(14, 400, { color: C.ink, textDecorationLine: 'underline' })]}>Send a new code</Text>
+      </Pressable>
+      {onBack ? <LinkLine text="Wrong email?" action="Go back" onPress={onBack} /> : null}
+    </View>
+  );
+}

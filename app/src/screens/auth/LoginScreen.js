@@ -6,7 +6,7 @@ import { Rises } from '../../components/anim';
 import { useAuth } from '../../lib/auth';
 import { T, C } from '../../theme';
 import GoogleButton from './GoogleButton';
-import { AuthTitle, AuthField, DarkButton, SoftButton, LinkLine, ErrorText, OrLine } from './parts';
+import { AuthTitle, AuthField, DarkButton, SoftButton, LinkLine, ErrorText, OrLine, CodeStep } from './parts';
 
 export default function LoginScreen({ goCreate, goForgot }) {
   const auth = useAuth();
@@ -15,15 +15,17 @@ export default function LoginScreen({ goCreate, goForgot }) {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(null); // 'login' | 'guest'
   const [error, setError] = useState('');
+  const [needsCode, setNeedsCode] = useState(false); // a new phone: Clerk emails a code before letting you in
 
   const run = async (kind, fn) => {
     setError('');
     setBusy(kind);
-    try { await fn(); } catch (e) { setError(e.message); setBusy(null); }
+    try { await fn(); } catch (e) { setError(e.message); }
+    setBusy(null);
   };
   const submit = () => {
     if (!email.trim() || !password) return setError('Enter your email and password');
-    run('login', () => auth.login({ email, password }));
+    run('login', async () => { const r = await auth.login({ email, password }); if (r?.needsCode) setNeedsCode(true); });
   };
 
   return (
@@ -31,6 +33,9 @@ export default function LoginScreen({ goCreate, goForgot }) {
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + 56, paddingBottom: insets.bottom + 30, paddingHorizontal: 22, gap: 14 }}>
 <Rises>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 6 }}><LogoMark size={52} id="au" /><Text style={[T(32, 700, { color: '#02154A', letterSpacing: -1.2 })]}>Ledgero</Text></View>
+        {needsCode ? (
+          <CodeStep email={email} onVerify={auth.verifyLogin} onResend={auth.resendLogin} onBack={() => setNeedsCode(false)} />
+        ) : (<>
         <AuthTitle>Login</AuthTitle>
         <View style={{ height: 8 }} />
         <AuthField icon="mail" placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoComplete="email" textContentType="emailAddress" returnKeyType="next" />
@@ -45,6 +50,7 @@ export default function LoginScreen({ goCreate, goForgot }) {
         <GoogleButton onError={setError} disabled={!!busy} />
         <SoftButton icon="guest" label="Continue As Guest" onPress={() => run('guest', auth.guest)} disabled={!!busy} />
         <LinkLine text="Need an account?" action="Sign up" onPress={goCreate} />
+        </>)}
       </Rises>
 </ScrollView>
     </KeyboardAvoidingView>

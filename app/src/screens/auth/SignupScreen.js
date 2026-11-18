@@ -6,7 +6,7 @@ import { Rises } from '../../components/anim';
 import { useAuth } from '../../lib/auth';
 import { T, C } from '../../theme';
 import Icon from '../../components/Icon';
-import { AuthTitle, AuthField, DarkButton, LinkLine, ErrorText, D } from './parts';
+import { AuthTitle, AuthField, DarkButton, LinkLine, ErrorText, CodeStep, D } from './parts';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -29,6 +29,7 @@ export default function SignupScreen({ goBack, goLogin }) {
   const [agree, setAgree] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [needsCode, setNeedsCode] = useState(false); // Clerk has emailed a code to confirm the address
   const s = strength(password);
 
   const submit = async () => {
@@ -39,7 +40,8 @@ export default function SignupScreen({ goBack, goLogin }) {
     if (!agree) return setError('Please accept the Terms and Privacy policy');
     setError('');
     setBusy(true);
-    try { await auth.signup({ name, email, password }); } catch (e) { setError(e.message); setBusy(false); }
+    try { await auth.signup({ name, email, password }); setNeedsCode(true); } catch (e) { setError(e.message); }
+    setBusy(false);
   };
 
   return (
@@ -50,6 +52,9 @@ export default function SignupScreen({ goBack, goLogin }) {
           <Icon name="chevL" size={22} color={C.ink} strokeWidth={1.8} />
         </Pressable>
 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 6 }}><LogoMark size={52} id="au" /><Text style={[T(32, 700, { color: '#02154A', letterSpacing: -1.2 })]}>Ledgero</Text></View>
+        {needsCode ? (
+          <CodeStep email={email} onVerify={auth.verifySignup} onResend={auth.resendSignup} onBack={() => setNeedsCode(false)} />
+        ) : (<>
         <AuthTitle>Sign up</AuthTitle>
         <View style={{ height: 6 }} />
         <AuthField icon="user" placeholder="Full name" value={name} onChangeText={setName} autoCapitalize="words" autoComplete="name" textContentType="name" />
@@ -70,6 +75,7 @@ export default function SignupScreen({ goBack, goLogin }) {
         <ErrorText>{error}</ErrorText>
         <DarkButton label="Create account" onPress={submit} loading={busy} />
         <LinkLine text="Already have an account?" action="Log in" onPress={goLogin} />
+        </>)}
       </Rises>
 </ScrollView>
     </KeyboardAvoidingView>

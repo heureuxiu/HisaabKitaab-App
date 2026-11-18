@@ -16,7 +16,6 @@ export default function AccountSheet({ visible, onClose }) {
   const [askDel, setAskDel] = useState(false);
   const [typed, setTyped] = useState('');
   const [deleting, setDeleting] = useState(false);
-  const [upgraded, setUpgraded] = useState(false);
   const confirmLogout = () => setAsk(true);
   const doLogout = () => { setAsk(false); onClose(); auth.logout(); };
 
@@ -39,7 +38,7 @@ export default function AccountSheet({ visible, onClose }) {
         <Sheet top={26} gap={16} bottom={40}>
           {u.guest ? (
             <Text style={[T(14, 400, { color: C.muted, lineHeight: 20 })]}>
-              This is a guest account. Your data is saved on the server for this phone only. If you log out or lose the phone, it cannot be recovered.
+              This is a guest account. Your data is saved on this phone only and is never sent anywhere. If you log out, delete the app or lose the phone, it cannot be recovered. Create an account to keep it safe.
             </Text>
           ) : (
             <Text style={[T(14, 400, { color: C.muted, lineHeight: 20 })]}>Everything you add is saved to your account, so you will see the same data on any phone you log in on.</Text>
@@ -52,7 +51,7 @@ export default function AccountSheet({ visible, onClose }) {
       </ScrollView>
       {u.guest ? (
         <Popup visible={ask} onClose={() => setAsk(false)} icon="warning" tone="orange" title="Guest account"
-          message="Logging out will permanently delete access to everything in this guest account. Create an account first to keep your data."
+          message="Logging out will permanently delete everything saved in this guest account on this phone. Create an account first to keep your data."
           actions={[{ label: 'Create account', kind: 'navy', onPress: () => { setAsk(false); setUpgrade(true); } },
             { label: 'Log out anyway', kind: 'ghostRed', onPress: doLogout },
             { label: 'Cancel', kind: 'ghost', onPress: () => setAsk(false) }]} />
@@ -73,10 +72,7 @@ export default function AccountSheet({ visible, onClose }) {
             style={[T(17, 500, { color: C.ink, height: 56, borderRadius: 20, borderWidth: 1.5, borderColor: typed ? '#D93F2E' : C.line, paddingHorizontal: 18, letterSpacing: 1 })]} />
         </View>
       </Popup>
-      <UpgradeSheet visible={upgrade} onClose={() => setUpgrade(false)} onDone={() => { setUpgrade(false); setUpgraded(true); }} />
-      <Popup visible={upgraded} onClose={() => setUpgraded(false)} icon="check" tone="green" title="Account created"
-        message="Your guest data is now saved to your email. You can log in on any phone."
-        actions={[{ label: 'Done', kind: 'navy', onPress: () => setUpgraded(false) }]} />
+      <UpgradeSheet visible={upgrade} onClose={() => setUpgrade(false)} />
     </Modal>
   );
 }

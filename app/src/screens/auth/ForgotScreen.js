@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LogoMark } from '../../components/Logo';
 import { Rises } from '../../components/anim';
-import { authApi } from '../../lib/api';
+import { useAuth } from '../../lib/auth';
 import { T, C } from '../../theme';
 import Icon from '../../components/Icon';
 import Popup from '../../components/Popup';
@@ -13,6 +13,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // Step 1: enter email, we send a 6-digit code. Step 2: enter the code and a new password; a popup confirms and sends you to Log in.
 export default function ForgotScreen({ goBack }) {
+  const auth = useAuth();
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
@@ -22,12 +23,13 @@ export default function ForgotScreen({ goBack }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
+  const verified = useRef(false); // the code can only be used once, so a retry after a weak password must not send it again
 
   const sendCode = async () => {
     if (!EMAIL_RE.test(email.trim())) return setError('Enter a valid email address');
     setError('');
     setBusy(true);
-    try { await authApi.forgot({ email: email.trim() }); setStep(2); } catch (e) { setError(e.message); }
+    try { await auth.forgotSend(email); verified.current = false; setStep(2); } catch (e) { setError(e.message); }
     setBusy(false);
   };
 
@@ -37,7 +39,7 @@ export default function ForgotScreen({ goBack }) {
     if (password !== confirm) return setError('The two passwords do not match');
     setError('');
     setBusy(true);
-    try { await authApi.reset({ email: email.trim(), code: code.trim(), password }); setBusy(false); setDone(true); } catch (e) { setError(e.message); setBusy(false); }
+    try { if (!verified.current) { await auth.forgotVerify(code); verified.current = true; } await auth.forgotSubmit(password); setBusy(false); setDone(true); } catch (e) { setError(e.message); setBusy(false); }
   };
 
   return (
@@ -50,7 +52,7 @@ export default function ForgotScreen({ goBack }) {
 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 6 }}><LogoMark size={52} id="au" /><Text style={[T(32, 700, { color: '#02154A', letterSpacing: -1.2 })]}>Ledgero</Text></View>
         <AuthTitle>{step === 1 ? 'Forgot password' : 'New password'}</AuthTitle>
         <Text style={[T(14, 400, { color: C.muted, textAlign: 'center', lineHeight: 20, paddingHorizontal: 8 })]}>
-          {step === 1 ? 'Enter your email and we will send you a 6-digit code.' : `We sent a code to ${email.trim()}. It works for 15 minutes.`}
+          {step === 1 ? 'Enter your email and we will send you a 6-digit code.' : `We sent a code to ${email.trim()}. Enter it with your new password.`}
         </Text>
         <View style={{ height: 4 }} />
         {step === 1 ? (

@@ -18,9 +18,20 @@ export function Rise({ delay = 0, distance = 22, duration = 520, style, children
   );
 }
 
+// A <>...</> or a conditional group counts as one child; open it up so each item inside still gets its own Rise
+// (and so the ScrollView's gap keeps spacing them).
+function items(children) {
+  const out = [];
+  React.Children.forEach(children, (c) => {
+    if (React.isValidElement(c) && c.type === React.Fragment) out.push(...items(c.props.children));
+    else if (c !== null && c !== undefined && c !== false && c !== true) out.push(c);
+  });
+  return out;
+}
+
 /** Wraps each child in a Rise, one after another. Use as the direct content of a ScrollView. */
 export function Rises({ children, start = 60, step = 45, itemStyle }) {
-  return <>{React.Children.toArray(children).map((c, i) => <Rise key={i} delay={start + i * step} distance={14} duration={460} style={itemStyle}>{c}</Rise>)}</>;
+  return <>{items(children).map((c, i) => <Rise key={i} delay={start + i * step} distance={14} duration={460} style={itemStyle}>{c}</Rise>)}</>;
 }
 
 /** A whole screen sliding in from the side it was reached from (dir 1 = forward, -1 = back) while fading. */
