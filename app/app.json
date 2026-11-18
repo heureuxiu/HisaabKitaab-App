@@ -28,7 +28,16 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-build-properties",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "buildArchs": ["arm64-v8a"],
+            "enableMinifyInReleaseBuild": true,
+            "enableShrinkResourcesInReleaseBuild": true
+          }
+        }
+      ],
       "expo-font",
       "expo-notifications",
       [
