@@ -41,13 +41,13 @@ export default function ForgotScreen({ goBack }) {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#FFFFFF' }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#FFFFFF' }} behavior={'padding'}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 30, paddingHorizontal: 22, gap: 14 }}>
 <Rises>
         <Pressable onPress={step === 2 ? () => { setStep(1); setError(''); } : goBack} accessibilityLabel="Back" style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#F1F3F6', alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="chevL" size={22} color={C.ink} strokeWidth={1.8} />
         </Pressable>
-<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 2 }}><LogoMark size={34} id="au" /><Text style={[T(24, 700, { color: '#02154A', letterSpacing: -0.9 })]}>Ledgero</Text></View>
+<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 6 }}><LogoMark size={52} id="au" /><Text style={[T(32, 700, { color: '#02154A', letterSpacing: -1.2 })]}>Ledgero</Text></View>
         <AuthTitle>{step === 1 ? 'Forgot password' : 'New password'}</AuthTitle>
         <Text style={[T(14, 400, { color: C.muted, textAlign: 'center', lineHeight: 20, paddingHorizontal: 8 })]}>
           {step === 1 ? 'Enter your email and we will send you a 6-digit code.' : `We sent a code to ${email.trim()}. It works for 15 minutes.`}

@@ -25,8 +25,12 @@ function Chip({ label }) {
 
 export default function GetStartedScreen({ onStart, goLogin }) {
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
-  const k = Math.min(1, width / 390); // the art is drawn on a 390 wide grid and shrinks on narrow phones
+  const { width, height } = useWindowDimensions();
+  // Everything is drawn for a 390 x ~830 phone and scales down on narrower or shorter ones, so nothing overlaps.
+  const usable = height - insets.top - insets.bottom;
+  const k = Math.max(0.55, Math.min(1, width / 390, usable / 800));
+  const sz = (n) => Math.round(n * k);
+  const artTop = insets.top + Math.round(40 * k);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#F8FAFD', overflow: 'hidden' }}>
@@ -34,7 +38,7 @@ export default function GetStartedScreen({ onStart, goLogin }) {
       <View style={{ position: 'absolute', left: -150, bottom: -150, width: 440, height: 440, borderRadius: 220, backgroundColor: 'rgba(10,45,140,0.06)' }} />
 
       {/* Art: logo, swirl, two cards and the tilted pill */}
-      <View style={{ position: 'absolute', left: 0, top: insets.top + 40, width: 390, height: 400, transformOrigin: 'top left', transform: [{ scale: k }] }}>
+      <View style={{ position: 'absolute', left: 0, top: artTop, width: 390, height: 400, transformOrigin: 'top left', transform: [{ scale: k }] }}>
         <Rise delay={0} distance={-14} style={{ position: 'absolute', left: 30, top: 0 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
             <LogoMark size={28} id="gs" />
@@ -48,7 +52,7 @@ export default function GetStartedScreen({ onStart, goLogin }) {
           </Svg>
         </Rise>
 
-        <Rise delay={200} distance={40} duration={700} style={{ position: 'absolute', left: 206, top: 14, width: 230, height: 196 }}>
+        <Rise delay={200} distance={40} duration={700} style={{ position: 'absolute', left: 206, top: 14, width: Math.max(230, width / k - 190), height: 196 }}>
           <View style={[{ flex: 1, borderRadius: 30, backgroundColor: '#FFFFFF', padding: 20, paddingHorizontal: 18, overflow: 'hidden' }, shadow('#0A2D8C', 0.14, 30, 22)]}>
             <Chip label="PKR · Income" />
             <Text style={[T(13, 400, { color: '#8A94A3', marginTop: 22 })]}>This month</Text>
@@ -85,24 +89,24 @@ export default function GetStartedScreen({ onStart, goLogin }) {
       </View>
 
       {/* Headline, text and button sit at the bottom so tall and short phones both look right */}
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 30, paddingBottom: insets.bottom + 22 }}>
+      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: sz(30), paddingBottom: insets.bottom + sz(22) }}>
         <Rise delay={420} distance={26}>
           <View style={{ paddingLeft: 4 }}>
-            <Text style={[T(62, 300, { color: C.ink, letterSpacing: -3, lineHeight: 66 })]}>Your</Text>
-            <Text style={[T(62, 700, { color: C.ink, letterSpacing: -3, lineHeight: 66 })]}>Personal</Text>
-            <Text style={[T(62, 300, { color: C.ink, letterSpacing: -3, lineHeight: 66 })]}>Ledger</Text>
-            <Text style={[T(15, 400, { color: C.muted, lineHeight: 22, marginTop: 14, paddingRight: 14 })]}>
+            <Text style={[T(sz(62), 300, { color: C.ink, letterSpacing: -sz(3), lineHeight: sz(66) })]}>Your</Text>
+            <Text style={[T(sz(62), 700, { color: C.ink, letterSpacing: -sz(3), lineHeight: sz(66) })]}>Personal</Text>
+            <Text style={[T(sz(62), 300, { color: C.ink, letterSpacing: -sz(3), lineHeight: sz(66) })]}>Ledger</Text>
+            <Text style={[T(Math.max(13, sz(15)), 400, { color: C.muted, lineHeight: Math.max(19, sz(22)), marginTop: sz(14), paddingRight: 14 })]}>
               Track income, savings and kharcha in one place, and see exactly where your money goes every month.
             </Text>
           </View>
         </Rise>
         <Rise delay={650} distance={30}>
-          <Pressable onPress={onStart} accessibilityRole="button" accessibilityLabel="Get started" style={({ pressed }) => ({ opacity: pressed ? 0.9 : 1, marginTop: 24 })}>
-            <View style={{ height: 58, borderRadius: 29, backgroundColor: DEEP, alignItems: 'center', justifyContent: 'center' }}>
+          <Pressable onPress={onStart} accessibilityRole="button" accessibilityLabel="Get started" style={({ pressed }) => ({ opacity: pressed ? 0.9 : 1, marginTop: sz(24) })}>
+            <View style={{ height: Math.max(50, sz(58)), borderRadius: 29, backgroundColor: DEEP, alignItems: 'center', justifyContent: 'center' }}>
               <Text style={[T(17, 600, { color: '#FFFFFF' })]}>Get started</Text>
             </View>
           </Pressable>
-          <Pressable onPress={goLogin} hitSlop={8} style={{ alignItems: 'center', marginTop: 16 }}>
+          <Pressable onPress={goLogin} hitSlop={8} style={{ alignItems: 'center', marginTop: sz(16) }}>
             <Text style={[T(13, 400, { color: C.muted })]}>Already have an account? <Text style={[T(13, 600, { color: C.ink })]}>Log in</Text></Text>
           </Pressable>
         </Rise>

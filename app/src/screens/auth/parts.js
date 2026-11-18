@@ -7,7 +7,7 @@ export const D = '#02154A'; // dark button / title colour
 const FIELD_LINE = '#E3E7EC';
 
 export function AuthTitle({ children }) {
-  return <Text style={[T(30, 700, { color: D, textAlign: 'center', letterSpacing: -0.9 })]}>{children}</Text>;
+  return <Text style={[T(30, 700, { color: C.navy, textAlign: 'center', letterSpacing: -0.9 })]}>{children}</Text>;
 }
 
 export function AuthField({ icon, secure, style, ...props }) {
@@ -56,7 +56,7 @@ export function SoftButton({ icon, label, onPress, bg = '#F1F3F6', disabled }) {
 export function LinkLine({ text, action, onPress }) {
   return (
     <Pressable onPress={onPress} hitSlop={8} style={{ alignItems: 'center', paddingVertical: 4 }}>
-      <Text style={[T(15, 400, { color: C.muted })]}>{text} <Text style={[T(15, 700, { color: C.ink })]}>{action}</Text></Text>
+      <Text style={[T(15, 400, { color: C.muted })]}>{text} <Text style={[T(15, 700, { color: C.blue })]}>{action}</Text></Text>
     </Pressable>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, useWindowDimensions } from 'react-native';
 import Svg, { Ellipse, Path, Circle, G } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Rises } from '../../components/anim';
@@ -11,8 +11,10 @@ import { AuthTitle, SoftButton, LinkLine, ErrorText, D } from './parts';
 const LB = '#A9C8FF';
 
 function Illustration() {
+  const { width, height } = useWindowDimensions();
+  const w = Math.max(190, Math.min(300, width - 90, height * 0.3));
   return (
-    <Svg width={300} height={236} viewBox="0 0 300 236" fill="none">
+    <Svg width={w} height={w * 236 / 300} viewBox="0 0 300 236" fill="none">
       <Ellipse cx="150" cy="214" rx="92" ry="7" fill={D} opacity={0.1} />
       <Ellipse cx="62" cy="222" rx="14" ry="3.5" stroke={D} strokeWidth="2" />
       <Ellipse cx="250" cy="224" rx="10" ry="3" stroke={D} strokeWidth="2" />
@@ -36,6 +38,7 @@ function Illustration() {
 export default function CreateAccountScreen({ goSignup, goLogin }) {
   const auth = useAuth();
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -46,10 +49,10 @@ export default function CreateAccountScreen({ goSignup, goLogin }) {
   };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }} contentContainerStyle={{ paddingTop: insets.top + 60, paddingBottom: insets.bottom + 30, paddingHorizontal: 24, alignItems: 'center' }}>
-<Rises>
-      <Illustration />
-      <View style={{ marginTop: 28 }}><AuthTitle>Create your account</AuthTitle></View>
+    <ScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }} contentContainerStyle={{ paddingTop: insets.top + Math.min(60, height * 0.06), paddingBottom: insets.bottom + 30, paddingHorizontal: 24, alignItems: 'center' }}>
+<Rises itemStyle={{ alignSelf: 'stretch' }}>
+      <View style={{ alignItems: 'center' }}><Illustration /></View>
+      <View style={{ marginTop: 24 }}><AuthTitle>Create your account</AuthTitle></View>
       <Text style={[T(15, 400, { color: C.ink, textAlign: 'center', lineHeight: 21, marginTop: 10, paddingHorizontal: 10 })]}>
         Your own private ledger. Income, savings and expenses, saved against your account.
       </Text>
