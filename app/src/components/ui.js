@@ -165,7 +165,7 @@ export function Seg({ options, value, onChange, dark = true }) {
         const fg = on ? (dark ? C.ink : '#FFFFFF') : (dark ? 'rgba(255,255,255,0.85)' : C.ink);
         return (
           <Pressable key={id} onPress={() => onChange && onChange(id)} style={{ flex: 1, height: 40, borderRadius: 20, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={[T(15, 500, { color: fg })]}>{label}</Text>
+            <Text numberOfLines={1} adjustsFontSizeToFit style={[T(15, 500, { color: fg, paddingHorizontal: 2 })]}>{label}</Text>
           </Pressable>
         );
       })}
@@ -250,7 +250,7 @@ export function AmountPrompt({ visible, title, hint, initial, onCancel, onSave }
   const n = text === '' ? 0 : Number(text);
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: 'rgba(2,21,74,0.5)', justifyContent: 'center', padding: 24 }}>
+      <KeyboardAvoidingView behavior={'padding'} style={{ flex: 1, backgroundColor: 'rgba(2,21,74,0.5)', justifyContent: 'center', padding: 24 }}>
         <View style={{ backgroundColor: '#FFFFFF', borderRadius: 32, padding: 22 }}>
           <Text style={[T(22, 500, { color: C.ink, letterSpacing: -0.6 })]}>{title}</Text>
           {hint ? <Text style={[T(14, 400, { color: C.muted, marginTop: 4 })]}>{hint}</Text> : null}

@@ -19,8 +19,8 @@ export function Rise({ delay = 0, distance = 22, duration = 520, style, children
 }
 
 /** Wraps each child in a Rise, one after another. Use as the direct content of a ScrollView. */
-export function Rises({ children, start = 120, step = 70 }) {
-  return <>{React.Children.toArray(children).map((c, i) => <Rise key={i} delay={start + i * step}>{c}</Rise>)}</>;
+export function Rises({ children, start = 60, step = 45, itemStyle }) {
+  return <>{React.Children.toArray(children).map((c, i) => <Rise key={i} delay={start + i * step} distance={14} duration={460} style={itemStyle}>{c}</Rise>)}</>;
 }
 
 /** A whole screen sliding in from the side it was reached from (dir 1 = forward, -1 = back) while fading. */
@@ -49,24 +49,9 @@ export function FadeIn({ duration = 450, children }) {
   return <Animated.View style={{ flex: 1, opacity: v, transform: [{ scale: v.interpolate({ inputRange: [0, 1], outputRange: [0.985, 1] }) }] }}>{children}</Animated.View>;
 }
 
-/** Wraps a tab screen so it eases in softly when its tab is opened. Only a light opacity change:
- *  moving or fully fading a screen shows the white page behind it, which looks like a flash. */
+/** Kept so the tab list in App.js stays the same. A tab screen is NOT faded as a whole any more: dimming it let the
+ *  white page behind it show through the blue header, which looked like a white flash. The soft entrance now happens
+ *  to the content under the header only (see CollapseScroll), so the blue header never flickers. */
 export function withFocusRise(Screen) {
-  const { useIsFocused } = require('@react-navigation/native');
-  return function Risen(props) {
-    const focused = useIsFocused();
-    const v = useRef(new Animated.Value(1)).current;
-    useEffect(() => {
-      if (!focused) return undefined;
-      v.setValue(0);
-      const a = Animated.timing(v, { toValue: 1, duration: 260, easing: Easing.out(Easing.quad), useNativeDriver: true });
-      a.start();
-      return () => a.stop();
-    }, [focused, v]);
-    return (
-      <Animated.View style={{ flex: 1, opacity: v.interpolate({ inputRange: [0, 1], outputRange: [0.86, 1] }) }}>
-        <Screen {...props} />
-      </Animated.View>
-    );
-  };
+  return Screen;
 }

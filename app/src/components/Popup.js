@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, Text, Pressable } from 'react-native';
+import { Modal, View, Text, Pressable, ScrollView, KeyboardAvoidingView, useWindowDimensions } from 'react-native';
 import { C, T } from '../theme';
 import Icon from './Icon';
 
@@ -38,6 +38,7 @@ export function PopupButton({ label, kind = 'soft', onPress, disabled, height = 
  */
 export default function Popup({ visible, onClose, icon, tone = 'navy', title, message, children, actions = [], row, sheet }) {
   const t = TONES[tone];
+  const { height } = useWindowDimensions();
   const buttons = row
     ? <View style={{ flexDirection: 'row', gap: 12 }}>{actions.map((a) => <View key={a.label} style={{ flex: 1 }}><PopupButton {...a} /></View>)}</View>
     : <View style={{ gap: 8 }}>{actions.map((a) => <PopupButton key={a.label} {...a} height={a.kind === 'ghost' ? 48 : 54} />)}</View>;
@@ -57,13 +58,15 @@ export default function Popup({ visible, onClose, icon, tone = 'navy', title, me
   );
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(6,14,36,0.62)', justifyContent: sheet ? 'flex-end' : 'center', padding: sheet ? 0 : 24 }}>
         <Pressable onPress={() => {}} style={sheet
           ? { backgroundColor: '#FFFFFF', borderTopLeftRadius: 38, borderTopRightRadius: 38, paddingHorizontal: 24, paddingTop: 12, paddingBottom: 34 }
           : { backgroundColor: '#FFFFFF', borderRadius: 34, paddingHorizontal: 24, paddingTop: 30, paddingBottom: 24, elevation: 24, shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 40, shadowOffset: { width: 0, height: 30 } }}>
-          {body}
+          <ScrollView bounces={false} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={{ maxHeight: height * 0.8 }}>{body}</ScrollView>
         </Pressable>
       </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

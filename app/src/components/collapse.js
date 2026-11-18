@@ -1,10 +1,11 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { View, Text, Animated, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { NavigationContext } from '@react-navigation/native';
 import { C, T } from '../theme';
 import { useTopExtra } from './ui';
 
-export const COMPACT_H = 66;
+export const COMPACT_H = 132;
 
 /**
  * A screen with a blue header that shrinks while you scroll down and grows back when you scroll up.
@@ -25,6 +26,27 @@ export function CollapseScroll({ h, header, compact, children, refreshControl, c
   const [collapsed, setCollapsed] = useState(false);
   const [viewH, setViewH] = useState(0);
   const flag = useRef(false);
+
+  // Tab screens stay mounted, so without this a screen you left half scrolled came back with its header still
+  // collapsed. Going away from the screen and coming back both put it back to the top with the full header.
+  const nav = useContext(NavigationContext);
+  // body entrance: the content under the header fades up a little each time the tab is opened
+  const body = useRef(new Animated.Value(nav && nav.isFocused && !nav.isFocused() ? 0 : 1)).current;
+  const reset = useCallback(() => {
+    ref.current?.scrollTo({ y: 0, animated: false });
+    y.setValue(0);
+    off.current = 0;
+    flag.current = false;
+    setCollapsed(false);
+  }, [y]);
+  useEffect(() => {
+    if (!nav) return undefined;
+    const a = nav.addListener('blur', () => { reset(); body.setValue(0); });
+    const b = nav.addListener('focus', () => {
+      Animated.timing(body, { toValue: 1, duration: 380, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+    });
+    return () => { a(); b(); };
+  }, [nav, reset, body]);
 
   const onScroll = Animated.event([{ nativeEvent: { contentOffset: { y } } }], {
     useNativeDriver: true,
@@ -60,7 +82,7 @@ export function CollapseScroll({ h, header, compact, children, refreshControl, c
         contentContainerStyle={[{ paddingTop: full, minHeight: viewH + range }, contentStyle]}
         {...scrollProps}
       >
-        {children}
+        <Animated.View style={{ opacity: body, transform: [{ translateY: body.interpolate({ inputRange: [0, 1], outputRange: [14, 0] }) }] }}>{children}</Animated.View>
       </Animated.ScrollView>
 
       <Animated.View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: full, transform: [{ translateY: lift }] }}>
@@ -82,13 +104,13 @@ const absFill = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 };
 /** The collapsed header row: small button, title with an optional line under it, small button. */
 export function CompactBar({ left, title, sub, right }) {
   return (
-    <View style={{ height: COMPACT_H - 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-      <View style={{ width: 42 }}>{left}</View>
+    <View style={{ height: COMPACT_H - 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+      <View style={{ width: 50 }}>{left}</View>
       <View style={{ flex: 1, alignItems: 'center' }}>
-        <Text numberOfLines={1} style={[T(18, 600, { color: '#FFFFFF', letterSpacing: -0.4 })]}>{title}</Text>
-        {sub ? <Text numberOfLines={1} style={[T(13, 400, { color: 'rgba(255,255,255,0.75)', marginTop: 1 })]}>{sub}</Text> : null}
+        <Text numberOfLines={1} style={[T(23, 600, { color: "#FFFFFF", letterSpacing: -0.6 })]}>{title}</Text>
+        {sub ? <Text numberOfLines={1} style={[T(15, 400, { color: "rgba(255,255,255,0.78)", marginTop: 3 })]}>{sub}</Text> : null}
       </View>
-      <View style={{ width: 42 }}>{right}</View>
+      <View style={{ width: 50 }}>{right}</View>
     </View>
   );
 }
