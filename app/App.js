@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -30,6 +30,10 @@ import AuthFlow from './src/screens/auth/AuthFlow';
 import SplashView, { SPLASH_MS } from './src/screens/auth/SplashView';
 import { FadeIn, withFocusRise } from './src/components/anim';
 
+// Respect the phone's font size setting, but not beyond what the layouts can hold.
+Text.defaultProps = { ...(Text.defaultProps || {}), maxFontSizeMultiplier: 1.2 };
+TextInput.defaultProps = { ...(TextInput.defaultProps || {}), maxFontSizeMultiplier: 1.2 };
+
 const Tab = createBottomTabNavigator();
 const Home = withFocusRise(HomeScreen);
 const Activity = withFocusRise(ActivityScreen);
@@ -50,7 +54,7 @@ function Shell() {
   return (
     <SheetCtx.Provider value={api}>
       <NavigationContainer ref={navRef} theme={navTheme}>
-        <Tab.Navigator tabBar={(props) => <TabBar {...props} />} screenOptions={{ headerShown: false, animation: 'none', tabBarStyle: { position: 'absolute' } }}>
+        <Tab.Navigator tabBar={(props) => <TabBar {...props} />} screenOptions={{ headerShown: false, animation: 'none', lazy: false, tabBarStyle: { position: 'absolute' } }}>
           <Tab.Screen name="Home" component={Home} />
           <Tab.Screen name="Activity" component={Activity} />
           <Tab.Screen name="Budgets" component={Budgets} />
