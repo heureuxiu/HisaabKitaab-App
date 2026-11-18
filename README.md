@@ -13,11 +13,11 @@ HisaabKitaab/
 ```
 cd backend
 npm install
-npm start          # needs MONGODB_URI and JWT_SECRET in backend/.env (see .env.example)
-npm test           # 22 tests, in-memory store, no database needed
+npm start          # needs MONGODB_URI and CLERK_SECRET_KEY in backend/.env (see .env.example)
+npm test           # in-memory store, no database needed
 ```
-Accounts: sign up, log in, guest, forgot/reset password (6-digit code by email, needs `RESEND_API_KEY`), Google sign-in,
-guest -> real account (`POST /auth/upgrade`) and account deletion (`DELETE /auth/me`).
+Accounts are handled by Clerk (email + code, password reset, Google). The server only checks the Clerk session token.
+Guest mode keeps the ledger on the phone and moves it to the server when the guest creates an account.
 Details are in `backend/README.md`.
 
 ## App
@@ -26,6 +26,7 @@ cd app
 npm install
 npx expo start -c
 ```
-Optional for Google sign-in: `npx expo install expo-auth-session expo-web-browser expo-crypto` and set the `EXPO_PUBLIC_GOOGLE_*_CLIENT_ID` values.
+Needs `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` (see `app/.env.example`). Packages: `npx expo install @clerk/expo expo-secure-store expo-web-browser`.
+Clerk's native parts need an EAS build, not Expo Go: `eas build -p android --profile preview`.
 
 The app name is Ledgero. Internal ids (Android package, storage keys, database name) still say `hisaab`, so existing installs and data keep working.

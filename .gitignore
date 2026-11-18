@@ -13,3 +13,6 @@ backend/data/
 
 # local Claude settings
 .claude/
+
+# files waiting to be deleted by hand
+_to_delete/
